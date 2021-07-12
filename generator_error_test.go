@@ -19,21 +19,18 @@ package regen
 import (
 	"errors"
 	"testing"
-
-	. "github.com/smartystreets/goconvey/convey"
 )
 
-func TestGeneratorError(t *testing.T) {
-	Convey("GeneratorError", t, func() {
+func TestGeneratorNilCause(t *testing.T) {
+	err := generatorError(nil, "msg")
+	if err.Error() != "msg" {
+		t.Fatalf("wrong message: %+v", err)
+	}
+}
 
-		Convey("Handles nil cause", func() {
-			err := generatorError(nil, "msg")
-			So(err.Error(), ShouldEqual, "msg")
-		})
-
-		Convey("Formats", func() {
-			err := generatorError(errors.New("cause"), "msg %s", "arg")
-			So(err.Error(), ShouldEqual, "msg arg\ncaused by cause")
-		})
-	})
+func TestFormats(t *testing.T) {
+	err := generatorError(errors.New("cause"), "msg %s", "arg")
+	if err.Error() != "msg arg\ncaused by cause" {
+		t.Fatalf("wrong message: %+v", err)
+	}
 }

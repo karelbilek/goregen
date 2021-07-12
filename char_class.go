@@ -116,5 +116,4 @@ func (r tCharClassRange) String() string {
 		return fmt.Sprintf("%s:1", runesToString(r.Start))
 	}
 	return fmt.Sprintf("%s-%s:%d", runesToString(r.Start), runesToString(r.Start+rune(r.Size-1)), r.Size)
-
 }

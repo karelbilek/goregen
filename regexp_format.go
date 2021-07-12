@@ -38,6 +38,7 @@ func inspectPatternsToString(simplify bool, patterns ...string) string {
 	}
 	return buffer.String()
 }
+
 func inspectPatternsToWriter(simplify bool, w io.Writer, patterns ...string) {
 	for _, pattern := range patterns {
 		inspectRegexpToWriter(w, parseOrPanic(simplify, pattern))

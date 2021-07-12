@@ -142,8 +142,8 @@ func (a *GeneratorArgs) initialize() error {
 	} else {
 		seed = a.RngSource.Int63()
 	}
-	rngSource := xorShift64Source(seed)
-	a.rng = rand.New(&rngSource)
+	rngSource := rand.NewSource(seed)
+	a.rng = rand.New(rngSource)
 
 	// unicode groups only allowed with Perl
 	if (a.Flags&syntax.UnicodeGroups) == syntax.UnicodeGroups && (a.Flags&syntax.Perl) != syntax.Perl {

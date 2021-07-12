@@ -36,7 +36,7 @@ var rngSource = rand.NewSource(42)
 // Doesn't actually run the generators.
 func BenchmarkComplexCreation(b *testing.B) {
 	// Create everything here to save allocations in the loop.
-	//args := &GeneratorArgs{rngSource, 0, NewSerialExecutor()}
+	// args := &GeneratorArgs{rngSource, 0, NewSerialExecutor()}
 	args := &GeneratorArgs{
 		RngSource: rngSource,
 		Flags:     0,
