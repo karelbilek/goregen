@@ -1,5 +1,6 @@
 /*
 Copyright 2014 Zachary Klippenstein
+Copyright 2021 Karel Bilek
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -97,30 +98,30 @@ func newGenerator(regexp *syntax.Regexp, args *GeneratorArgs) (generator *intern
 }
 
 // Generator that does nothing.
-func noop(regexp *syntax.Regexp, args *GeneratorArgs) (*internalGenerator, error) {
+func noop(regexp *syntax.Regexp, _ *GeneratorArgs) (*internalGenerator, error) {
 	return &internalGenerator{regexp.String(), func() string {
 		return ""
 	}}, nil
 }
 
-func opEmptyMatch(regexp *syntax.Regexp, args *GeneratorArgs) (*internalGenerator, error) {
+func opEmptyMatch(regexp *syntax.Regexp, _ *GeneratorArgs) (*internalGenerator, error) {
 	enforceOp(regexp, syntax.OpEmptyMatch)
 	return &internalGenerator{regexp.String(), func() string {
 		return ""
 	}}, nil
 }
 
-func opLiteral(regexp *syntax.Regexp, args *GeneratorArgs) (*internalGenerator, error) {
+func opLiteral(regexp *syntax.Regexp, _ *GeneratorArgs) (*internalGenerator, error) {
 	enforceOp(regexp, syntax.OpLiteral)
 	return &internalGenerator{regexp.String(), func() string {
 		return runesToString(regexp.Rune...)
 	}}, nil
 }
 
-func opAnyChar(regexp *syntax.Regexp, args *GeneratorArgs) (*internalGenerator, error) {
+func opAnyChar(regexp *syntax.Regexp, _ *GeneratorArgs) (*internalGenerator, error) {
 	enforceOp(regexp, syntax.OpAnyChar)
 	return &internalGenerator{regexp.String(), func() string {
-		return runesToString(rune(args.rng.Int31()))
+		return runesToString(rand.Int31())
 	}}, nil
 }
 
@@ -186,7 +187,7 @@ func opAlternate(regexp *syntax.Regexp, genArgs *GeneratorArgs) (*internalGenera
 	numGens := len(generators)
 
 	return &internalGenerator{regexp.String(), func() string {
-		i := genArgs.rng.Intn(numGens)
+		i := rand.Intn(numGens)
 		generator := generators[i]
 		return generator.Generate()
 	}}, nil
@@ -213,7 +214,7 @@ func opCapture(regexp *syntax.Regexp, args *GeneratorArgs) (*internalGenerator, 
 	}}, nil
 }
 
-func defaultCaptureGroupHandler(index int, name string, group *syntax.Regexp, generator Generator, args *GeneratorArgs) string {
+func defaultCaptureGroupHandler(_ int, _ string, _ *syntax.Regexp, generator Generator, _ *GeneratorArgs) string {
 	return generator.Generate()
 }
 
@@ -233,9 +234,9 @@ func enforceSingleSub(regexp *syntax.Regexp) error {
 	return nil
 }
 
-func createCharClassGenerator(name string, charClass *tCharClass, args *GeneratorArgs) (*internalGenerator, error) {
+func createCharClassGenerator(name string, charClass *tCharClass, _ *GeneratorArgs) (*internalGenerator, error) {
 	return &internalGenerator{name, func() string {
-		i := args.rng.Int31n(charClass.TotalSize)
+		i := rand.Int31n(charClass.TotalSize)
 		r := charClass.GetRuneAt(i)
 		return runesToString(r)
 	}}, nil
@@ -260,7 +261,7 @@ func createRepeatingGenerator(regexp *syntax.Regexp, genArgs *GeneratorArgs, min
 	}
 
 	return &internalGenerator{regexp.String(), func() string {
-		n := min + genArgs.rng.Intn(max-min+1)
+		n := min + rand.Intn(max-min+1)
 
 		var result bytes.Buffer
 		for i := 0; i < n; i++ {

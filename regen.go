@@ -1,5 +1,6 @@
 /*
 Copyright 2014 Zachary Klippenstein
+Copyright 2021 Karel Bilek
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -94,7 +95,6 @@ package regen
 
 import (
 	"fmt"
-	"math/rand"
 	"regexp/syntax"
 )
 
@@ -112,11 +112,6 @@ type CaptureGroupHandler func(index int, name string, group *syntax.Regexp, gene
 // GeneratorArgs are arguments passed to NewGenerator that control how generators
 // are created.
 type GeneratorArgs struct {
-	// May be nil.
-	// Used to seed a custom RNG that is a lot faster than the default implementation.
-	// See http://vigna.di.unimi.it/ftp/papers/xorshift.pdf.
-	RngSource rand.Source
-
 	// Default is 0 (syntax.POSIX).
 	Flags syntax.Flags
 
@@ -130,21 +125,9 @@ type GeneratorArgs struct {
 	// Set this to perform special processing of capture groups (e.g. `(\w+)`). The zero value will generate strings
 	// from the expressions in the group.
 	CaptureGroupHandler CaptureGroupHandler
-
-	// Used by generators.
-	rng *rand.Rand
 }
 
 func (a *GeneratorArgs) initialize() error {
-	var seed int64
-	if nil == a.RngSource {
-		seed = rand.Int63()
-	} else {
-		seed = a.RngSource.Int63()
-	}
-	rngSource := rand.NewSource(seed)
-	a.rng = rand.New(rngSource)
-
 	// unicode groups only allowed with Perl
 	if (a.Flags&syntax.UnicodeGroups) == syntax.UnicodeGroups && (a.Flags&syntax.Perl) != syntax.Perl {
 		return generatorError(nil, "UnicodeGroups not supported")
@@ -164,15 +147,6 @@ func (a *GeneratorArgs) initialize() error {
 	}
 
 	return nil
-}
-
-// Rng returns the random number generator used by generators.
-// Panics if called before the GeneratorArgs has been initialized by NewGenerator.
-func (a *GeneratorArgs) Rng() *rand.Rand {
-	if a.rng == nil {
-		panic("GeneratorArgs has not been initialized by NewGenerator yet")
-	}
-	return a.rng
 }
 
 // Generator generates random strings.

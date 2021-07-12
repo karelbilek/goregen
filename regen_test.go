@@ -1,5 +1,6 @@
 /*
 Copyright 2014 Zachary Klippenstein
+Copyright 2021 Karel Bilek
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,7 +19,6 @@ package regen
 
 import (
 	"fmt"
-	"math/rand"
 	"os"
 	"regexp"
 	"regexp/syntax"
@@ -49,9 +49,7 @@ func ExampleNewGenerator() {
 	// Note that this uses a constant seed, so the generated string
 	// will always be the same across different runs of the program.
 	// Use a more random seed for real use (e.g. time-based).
-	generator, _ := NewGenerator(pattern, &GeneratorArgs{
-		RngSource: rand.NewSource(0),
-	})
+	generator, _ := NewGenerator(pattern, &GeneratorArgs{})
 
 	str := generator.Generate()
 
@@ -165,20 +163,6 @@ func TestGeneratorArgs(t *testing.T) {
 	t.Run("Rng", func(t *testing.T) {
 		t.Parallel()
 
-		t.Run("Panics if called before initialization", func(t *testing.T) {
-			t.Parallel()
-
-			args := GeneratorArgs{}
-
-			defer func() {
-				if r := recover(); r == nil {
-					t.Fatal("The code did not panic")
-				}
-			}()
-
-			args.Rng()
-		})
-
 		t.Run("Non-nil after initialization", func(t *testing.T) {
 			t.Parallel()
 
@@ -235,9 +219,7 @@ func TestNewGenerator(t *testing.T) {
 func TestGenEmpty(t *testing.T) {
 	t.Parallel()
 
-	args := &GeneratorArgs{
-		RngSource: rand.NewSource(0),
-	}
+	args := &GeneratorArgs{}
 
 	GeneratesStringMatching(t, args, "", "^$")
 }
@@ -272,8 +254,7 @@ func TestGenStringStartEnd(t *testing.T) {
 	t.Parallel()
 
 	args := &GeneratorArgs{
-		RngSource: rand.NewSource(0),
-		Flags:     0,
+		Flags: 0,
 	}
 
 	GeneratesStringMatching(t, args, `^abc$`, `^abc$`)
@@ -306,9 +287,7 @@ func TestGenStar(t *testing.T) {
 		t.Parallel()
 
 		regexp := "a*"
-		args := &GeneratorArgs{
-			RngSource: rand.NewSource(0),
-		}
+		args := &GeneratorArgs{}
 		counts := generateLenHistogram(regexp, DefaultMaxUnboundedRepeatCount, args)
 
 		if counts[0] <= 0 {
@@ -321,7 +300,6 @@ func TestGenStar(t *testing.T) {
 
 		regexp := "a*"
 		args := &GeneratorArgs{
-			RngSource:               rand.NewSource(0),
 			MinUnboundedRepeatCount: 200,
 		}
 		counts := generateLenHistogram(regexp, DefaultMaxUnboundedRepeatCount, args)
@@ -340,9 +318,7 @@ func TestGenStar(t *testing.T) {
 		t.Parallel()
 
 		regexp := "a*"
-		args := &GeneratorArgs{
-			RngSource: rand.NewSource(0),
-		}
+		args := &GeneratorArgs{}
 		counts := generateLenHistogram(regexp, DefaultMaxUnboundedRepeatCount, args)
 
 		if len(counts) != DefaultMaxUnboundedRepeatCount+1 {
@@ -358,7 +334,6 @@ func TestGenStar(t *testing.T) {
 
 		regexp := "a*"
 		args := &GeneratorArgs{
-			RngSource:               rand.NewSource(0),
 			MaxUnboundedRepeatCount: 200,
 		}
 		counts := generateLenHistogram(regexp, 200, args)
@@ -434,9 +409,7 @@ func TestGenRepeat(t *testing.T) {
 			t.Parallel()
 
 			regexp := "a{0,}"
-			args := &GeneratorArgs{
-				RngSource: rand.NewSource(0),
-			}
+			args := &GeneratorArgs{}
 			counts := generateLenHistogram(regexp, DefaultMaxUnboundedRepeatCount, args)
 
 			if len(counts) != DefaultMaxUnboundedRepeatCount+1 {
@@ -452,7 +425,6 @@ func TestGenRepeat(t *testing.T) {
 
 			regexp := "a{0,}"
 			args := &GeneratorArgs{
-				RngSource:               rand.NewSource(0),
 				MaxUnboundedRepeatCount: 200,
 			}
 			counts := generateLenHistogram(regexp, 200, args)
@@ -470,9 +442,7 @@ func TestGenRepeat(t *testing.T) {
 		t.Parallel()
 
 		regexp := "a{0,3}"
-		args := &GeneratorArgs{
-			RngSource: rand.NewSource(0),
-		}
+		args := &GeneratorArgs{}
 		counts := generateLenHistogram(regexp, 3, args)
 
 		if len(counts) != 3+1 {
@@ -487,9 +457,7 @@ func TestGenRepeat(t *testing.T) {
 		t.Parallel()
 
 		regexp := "a{0,3}"
-		args := &GeneratorArgs{
-			RngSource: rand.NewSource(0),
-		}
+		args := &GeneratorArgs{}
 		counts := generateLenHistogram(regexp, 3, args)
 
 		if len(counts) != 3+1 {
@@ -504,9 +472,7 @@ func TestGenRepeat(t *testing.T) {
 		t.Parallel()
 
 		regexp := "a{5,10}"
-		args := &GeneratorArgs{
-			RngSource: rand.NewSource(0),
-		}
+		args := &GeneratorArgs{}
 		counts := generateLenHistogram(regexp, 10, args)
 
 		if len(counts) != 11 {

@@ -1,5 +1,6 @@
 /*
 Copyright 2014 Zachary Klippenstein
+Copyright 2021 Karel Bilek
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

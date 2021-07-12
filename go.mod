@@ -1,3 +1,3 @@
-module github.com/zach-klippenstein/goregen
+module github.com/karelbilek/goregen
 
 go 1.16

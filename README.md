@@ -1,7 +1,7 @@
-#goregen [![GoDoc](https://godoc.org/github.com/zach-klippenstein/goregen?status.svg)](https://godoc.org/github.com/zach-klippenstein/goregen) [![Build Status](https://travis-ci.org/zach-klippenstein/goregen.svg?branch=master)](https://travis-ci.org/zach-klippenstein/goregen)
+A fork of Golang library for generating random strings from regular expressions.
 
-A Golang library for generating random strings from regular expressions.
+I took https://godoc.org/github.com/zach-klippenstein and made some changes to make it more suitable for my use:
 
-Checkout https://goregen-demo.herokuapp.com for a live demo.
-
-See the [godoc](https://godoc.org/github.com/zach-klippenstein/goregen) for examples.
+* use crypto.rand (by default and always)
+* remove use of all testing dependencies (most of them not all that useful)
+* add go.mod (which is empty though)

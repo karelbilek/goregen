@@ -1,5 +1,6 @@
 /*
 Copyright 2014 Zachary Klippenstein
+Copyright 2021 Karel Bilek
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,7 +18,6 @@ limitations under the License.
 package regen
 
 import (
-	"math/rand"
 	"testing"
 )
 
@@ -30,16 +30,13 @@ X-Auth-Token: [a-zA-Z0-9+/]{64}
 ){3,15}[A-Za-z0-9+/]{60}([A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)
 `
 
-var rngSource = rand.NewSource(42)
-
 // Benchmarks the code that creates generators.
 // Doesn't actually run the generators.
 func BenchmarkComplexCreation(b *testing.B) {
 	// Create everything here to save allocations in the loop.
 	// args := &GeneratorArgs{rngSource, 0, NewSerialExecutor()}
 	args := &GeneratorArgs{
-		RngSource: rngSource,
-		Flags:     0,
+		Flags: 0,
 	}
 
 	for i := 0; i < b.N; i++ {
@@ -49,16 +46,12 @@ func BenchmarkComplexCreation(b *testing.B) {
 
 func BenchmarkLargeRepeatCreateSerial(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		NewGenerator(`a{999}`, &GeneratorArgs{
-			RngSource: rand.NewSource(0),
-		})
+		NewGenerator(`a{999}`, &GeneratorArgs{})
 	}
 }
 
 func BenchmarkComplexGeneration(b *testing.B) {
-	args := &GeneratorArgs{
-		RngSource: rngSource,
-	}
+	args := &GeneratorArgs{}
 	generator, err := NewGenerator(BigFancyRegexp, args)
 	if err != nil {
 		panic(err)
@@ -71,9 +64,7 @@ func BenchmarkComplexGeneration(b *testing.B) {
 }
 
 func BenchmarkLargeRepeatGenerateSerial(b *testing.B) {
-	generator, err := NewGenerator(`a{999}`, &GeneratorArgs{
-		RngSource: rand.NewSource(0),
-	})
+	generator, err := NewGenerator(`a{999}`, &GeneratorArgs{})
 	if err != nil {
 		b.Fatal(err)
 	}
