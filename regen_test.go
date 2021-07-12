@@ -29,10 +29,6 @@ import (
 const (
 	// Each expression is generated and validated this many times.
 	SampleSize = 999
-
-	// Arbitrary limit in the standard package.
-	// See https://golang.org/src/regexp/syntax/parse.go?s=18885:18935#L796
-	MaxSupportedRepeatCount = 1000
 )
 
 func ExampleGenerate() {
